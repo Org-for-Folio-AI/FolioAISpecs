@@ -55,6 +55,7 @@ ICallHandler {
 ## Call State Machine
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 graph TD
     A["INITIATED<br/>Call started"] --> B{Connection<br/>established?}
     B -->|No Answer| E["FAILED<br/>No connection"]
@@ -86,15 +87,16 @@ graph TD
     O --> Q
     E --> Q
 
-    style A stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Q stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style E stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
-    style K stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style A stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Q stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style E stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
+    style K stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Call Execution Flow
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Receive Batch"] --> Init["Initiate call<br/>Emit CallInitiated"]
     Init --> Recording["Start recording<br/>Start timer"]
@@ -164,10 +166,10 @@ flowchart TD
     Emit2 --> Callback
     Emit2 --> Failed
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Emit2 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style Failed stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
-    style Callback stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Emit2 stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Failed stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Callback stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Call Configuration

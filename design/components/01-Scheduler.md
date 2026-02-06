@@ -48,6 +48,7 @@ IScheduler {
 ## Flow Diagram
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Start Scheduler"] --> Config["Load Configuration<br/>Check intervals"]
     Config --> Loop["Begin Cycle"]
@@ -77,11 +78,11 @@ flowchart TD
     Emit3 --> Sleep["Sleep until next interval"]
     Sleep --> Loop
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Loop stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
-    style Emit1 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style Emit2 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style Emit3 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Loop stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Emit1 stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Emit2 stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Emit3 stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Internal State Management

@@ -47,6 +47,7 @@ IBatchingEngine {
 ## Flow Diagram
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Receive Queued Records"] --> Load["Load record details<br/>from event log"]
     Load --> Group["Group by hotel<br/>phone number"]
@@ -82,10 +83,10 @@ flowchart TD
 
     EmitSchedule --> Done
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Estimate stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
-    style Overflow stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
-    style EmitBatch stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Estimate stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Overflow stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
+    style EmitBatch stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Duration Estimation Model

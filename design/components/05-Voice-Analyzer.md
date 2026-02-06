@@ -55,6 +55,7 @@ IVoiceAnalyzer {
 ## Audio Analysis Flow
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Audio received<br/>from call"] --> Transcribe["Transcribe speech<br/>using Voice LLM"]
 
@@ -101,10 +102,10 @@ flowchart TD
     EmitCallback --> Done
     EmitWillSend --> Done
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Done stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style Unclear stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
-    style Callback stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Done stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Unclear stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Callback stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Intent Classification

@@ -51,6 +51,7 @@ IIVRNavigator {
 ## IVR Detection Flow
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Audio received<br/>from call"] --> LoadVoice["Send to Voice LLM<br/>for analysis"]
 
@@ -74,15 +75,16 @@ flowchart TD
     Fallback --> Done
     Success --> Done
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Success stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style Fallback stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
-    style Return stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Success stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Fallback stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Return stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## IVR Navigation Flow
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Start Navigation<br/>Target: Billing Dept"] --> LoadConfig["Load hotel IVR config<br/>from database"]
 
@@ -123,9 +125,9 @@ flowchart TD
     Success --> Done["Done"]
     Failed --> Done
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Success stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style Failed stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Success stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Failed stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## IVR Configuration

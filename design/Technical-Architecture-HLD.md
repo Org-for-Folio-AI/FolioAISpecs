@@ -41,6 +41,7 @@ This document defines the technical architecture for the Folio automation system
 ## System Architecture Overview
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial', 'primaryColor': '#ffffff', 'primaryBorderColor': '#333333', 'primaryTextColor': '#000000', 'lineColor': '#333333', 'tertiaryColor': '#f5f5f5'}}%%
 graph TB
     subgraph External["External Systems"]
         VoiceLLM["Voice LLM Provider<br/>(Eleven Labs)"]
@@ -109,10 +110,10 @@ graph TB
     Batcher -.reads.-> EventStore
     CallHandler -.reads.-> ConfigStore
 
-    style EventStore stroke:#7b1fa2,fill:#f5f5f5,stroke-width:2px
-    style IVoiceLLM stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
-    style ITelephony stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
-    style IEmail stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
+    style EventStore stroke:#4a148c,fill:#ffffff,stroke-width:3px,font-size:16px
+    style IVoiceLLM stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style ITelephony stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style IEmail stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ---
@@ -122,6 +123,7 @@ graph TB
 ### Deployment Model
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 graph TB
     subgraph SingleProcess["Single Process / Container"]
         subgraph Components["All Components"]
@@ -177,8 +179,8 @@ graph TB
     SM --> ES
     ES --> S
 
-    style SingleProcess stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style InMemory stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style SingleProcess stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style InMemory stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 **Characteristics:**
@@ -196,6 +198,7 @@ graph TB
 ### Deployment Model
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 graph TB
     subgraph Services["Microservices"]
         SchedulerSvc["Scheduler Service"]
@@ -248,9 +251,9 @@ graph TB
     StatusSvc --> EventTopic
     EventTopic --> SchedulerSvc
 
-    style Services stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style MessageBroker stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
-    style DataLayer stroke:#7b1fa2,fill:#f5f5f5,stroke-width:2px
+    style Services stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style MessageBroker stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style DataLayer stroke:#4a148c,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 **Characteristics:**

@@ -54,6 +54,7 @@ IEmailMonitor {
 ## Email Monitoring Flow
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Monitor cycle"] --> Connect["Connect to email<br/>via Email Provider"]
 
@@ -107,9 +108,9 @@ flowchart TD
     Complete --> Sleep2["Sleep until<br/>next check"]
     Sleep2 --> Start
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Complete stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style Error stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Complete stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Error stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Email Correlation Logic

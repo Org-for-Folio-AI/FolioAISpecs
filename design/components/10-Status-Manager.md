@@ -51,6 +51,7 @@ IStatusManager {
 ## Status State Machine
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 graph TD
     NEW["NEW<br/>Created"] -->|Queued| QUEUED["QUEUED<br/>In scheduling queue"]
     QUEUED -->|Batched| SCHEDULED["SCHEDULED<br/>Batch ready"]
@@ -92,11 +93,11 @@ graph TD
     PARTIAL --> COMPLETED
     EXTRACT_FAIL --> COMPLETED
 
-    style NEW stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style COMPLETED stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style IN_CALL stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
-    style AGREED stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style FOLIO_REC stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style NEW stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style COMPLETED stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style IN_CALL stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style AGREED stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style FOLIO_REC stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Event-to-Status Mapping

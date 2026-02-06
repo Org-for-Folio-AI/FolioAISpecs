@@ -53,6 +53,7 @@ IEmailComposer {
 ## Email Composition Flow
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Request to compose<br/>email for record"] --> Load["Load guest data<br/>from event log"]
 
@@ -83,9 +84,9 @@ flowchart TD
     Error --> Done["Done"]
     Return --> Done
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Return stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style Error stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Return stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Error stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Email Template System
@@ -168,6 +169,7 @@ Reference ID: {reference_id}
 ## Email Sending Flow
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Send email request"] --> GetProvider["Get Email Provider<br/>SMTP/API client"]
 
@@ -191,9 +193,9 @@ flowchart TD
     Success --> Done
     Error --> Done
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Success stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style Error stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Success stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Error stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Configuration

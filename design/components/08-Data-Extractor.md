@@ -54,6 +54,7 @@ IDataExtractor {
 ## Data Extraction Flow
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Receive email response"] --> CheckContent{Has<br/>attachments?}
 
@@ -89,10 +90,10 @@ flowchart TD
     Partial --> Done
     Manual --> Done
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Success stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style Partial stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
-    style Failed stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Success stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Partial stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Failed stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Extraction Templates

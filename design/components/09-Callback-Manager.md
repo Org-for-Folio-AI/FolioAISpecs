@@ -54,6 +54,7 @@ ICallbackManager {
 ## Callback Scheduling Flow
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Receive callback request<br/>from Call Handler"] --> Extract["Extract data:<br/>Record ID<br/>Callback time<br/>Reason"]
 
@@ -83,14 +84,15 @@ flowchart TD
 
     Error --> Done
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Emit stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style Error stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Emit stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Error stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Verification Scheduling Flow
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start["Receive commitment<br/>Hotel will send folio"] --> Extract["Extract data:<br/>Record ID<br/>Promised time<br/>Delivery method"]
 
@@ -111,8 +113,8 @@ flowchart TD
     Store --> Emit["Emit VerificationScheduled"]
     Emit --> Done["Done"]
 
-    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style Emit stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style Start stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style Emit stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ## Callback/Verification Data Structures

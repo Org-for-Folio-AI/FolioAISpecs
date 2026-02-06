@@ -11,6 +11,7 @@ This document presents the logical architecture and process flows of the Folio a
 Logical view of system components and how they relate:
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 graph TB
     subgraph Input["Input Layer"]
         A["Record Creation/Import"]
@@ -92,29 +93,29 @@ graph TB
     J --> M
     E2 --> E3
 
-    style A stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style B stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
-    style C stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
-    style D stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
-    style E stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
-    style F stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
-    style F1 stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
-    style F2 stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
-    style F3 stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
-    style F4 stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
-    style E1 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style E2 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style E3 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style G stroke:#7b1fa2,fill:#f5f5f5,stroke-width:2px
-    style H stroke:#7b1fa2,fill:#f5f5f5,stroke-width:2px
-    style I1 stroke:#7b1fa2,fill:#f5f5f5,stroke-width:2px
-    style I2 stroke:#0097a7,fill:#f5f5f5,stroke-width:2px
-    style I stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style J stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style K stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style K1 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
-    style L stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
-    style M stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style A stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style B stroke:#003d82,fill:#ffffff,stroke-width:3px,font-size:16px
+    style C stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style D stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style E stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style F stroke:#e65100,fill:#ffffff,stroke-width:3px,font-size:16px
+    style F1 stroke:#d49300,fill:#ffffff,stroke-width:3px,font-size:16px
+    style F2 stroke:#d49300,fill:#ffffff,stroke-width:3px,font-size:16px
+    style F3 stroke:#d49300,fill:#ffffff,stroke-width:3px,font-size:16px
+    style F4 stroke:#d49300,fill:#ffffff,stroke-width:3px,font-size:16px
+    style E1 stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style E2 stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style E3 stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style G stroke:#4a148c,fill:#ffffff,stroke-width:3px,font-size:16px
+    style H stroke:#4a148c,fill:#ffffff,stroke-width:3px,font-size:16px
+    style I1 stroke:#4a148c,fill:#ffffff,stroke-width:3px,font-size:16px
+    style I2 stroke:#00695c,fill:#ffffff,stroke-width:3px,font-size:16px
+    style I stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style J stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style K stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style K1 stroke:#1b5e20,fill:#ffffff,stroke-width:3px,font-size:16px
+    style L stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
+    style M stroke:#b71c1c,fill:#ffffff,stroke-width:3px,font-size:16px
 ```
 
 ### Component Descriptions
@@ -148,6 +149,7 @@ graph TB
 How the system processes folio requests from start to finish:
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Start([New Folio Records]) --> Schedule["Scheduler picks up<br/>new records"]
 
@@ -234,6 +236,7 @@ flowchart TD
 How the system handles automated phone systems and voicemail:
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Connected["Connected to hotel"] --> Detect{What is<br/>the connection?}
 
@@ -292,6 +295,7 @@ flowchart TD
 How the system handles email-based folio requests and response extraction:
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
     Trigger["Email path needed<br/>or triggered"] --> Compose["Compose email:<br/>Guest name, Conf#<br/>Check-in/Check-out dates<br/>Folio request details"]
 
@@ -337,6 +341,7 @@ flowchart TD
 How a folio request record progresses through the system:
 
 ```mermaid
+%%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 graph LR
     R["Folio Request<br/>Record Created"]
 
@@ -388,6 +393,7 @@ graph LR
 Example of how components interact during a typical call:
 
 ```mermaid
+%%{init: {'fontSize': 16, 'fontFamily': 'arial'}}%%
 sequenceDiagram
     participant UI as User/System
     participant Sched as Scheduler
