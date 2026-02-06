@@ -61,11 +61,142 @@ For each folio request record, the system:
 
 #### Basic Flow
 1. System initiates call to hotel phone number
-2. For each batched folio request (oldest first):
-   - Request folio for [Guest Name] + [Reservation #]
-   - Provide destination email address to callee
-3. Callee commits to sending folio to provided email
+2. **IVR/Voicemail Detection** (see IVR Handling section below)
+3. If connected to person:
+   - For each batched folio request (oldest first):
+     - Request folio for [Guest Name] + [Reservation #]
+     - Provide destination email address to callee
+   - Callee commits to sending folio to provided email
 4. System records the status and updates each record
+
+---
+
+## IVR & Voicemail Handling
+
+### IVR Detection & Navigation
+
+**Scenario**: Hotel uses Interactive Voice Response (IVR) menu system
+
+**System Capabilities**:
+
+1. **IVR Detection**:
+   - Detects when connected to automated IVR system (vs. human)
+   - Analyzes audio to identify menu options
+   - Example: *"Press 1 for Reservations, Press 2 for Billing, Press 3 for Front Desk"*
+
+2. **DTMF Navigation**:
+   - Sends appropriate DTMF tones (button presses) to navigate IVR
+   - Hotel-specific mapping (configurable per hotel):
+     - Which menu option leads to billing/folio requests
+     - If routing varies: store preferred path for future calls
+   - Example: Hotel A uses "Press 2 for Billing" → System sends DTMF "2"
+
+3. **Menu Navigation Logging**:
+   - Records which IVR options were pressed
+   - Tracks menu path taken to reach person/billing
+   - Logs in audit trail for quality assurance
+
+### Voicemail Detection & Handling
+
+**Scenario**: Call lands on voicemail system
+
+**System Behavior**:
+
+1. **Voicemail Detection**:
+   - Analyzes audio characteristics to detect voicemail greeting
+   - Records if voicemail was detected
+
+2. **Voicemail Action Options**:
+
+   **Option A - Leave Message**:
+   - Leave pre-recorded message: *"This is an automated call requesting folio for [Guest Name], Confirmation #[###]. Please send to [email address]. Reference ID: [###]"*
+   - Mark record status: **Voicemail - Message Left**
+   - Reschedule for retry in defined timeframe (e.g., 24 hours)
+
+   **Option B - Hang Up & Reschedule**:
+   - Disconnect without leaving message (if configured)
+   - Mark record status: **Voicemail - No Message Left**
+   - Reschedule for retry in defined timeframe
+
+### Callback Scheduling from Verbal Instructions
+
+**Scenario**: Person answers but says *"Call back in 2 hours"* or *"We'll send tomorrow"*
+
+**System Capabilities**:
+
+1. **Callback Window Parsing**:
+   - Voice recognition extracts timeframe from human speech
+   - Understands variations:
+     - "Call back in 2 hours" → Schedule in 2 hours
+     - "Call back tomorrow" → Schedule for next business day
+     - "Call back in 3 days" → Schedule 72 hours from now
+     - "Try again after 5 PM" → Schedule after 5 PM today/tomorrow
+     - "We'll send the folio by EOD" → Mark as pending, verify by end of day
+
+2. **Callback Scheduling Logic**:
+   - Creates a **Rescheduled** record with new target call time
+   - Maintains original folio request context
+   - Links rescheduled record to original for audit trail
+   - Applies business hour rules (e.g., no calls before 8 AM or after 6 PM)
+
+3. **Status Recording**:
+   - Original record status: **Asked to try later - Callback Scheduled**
+   - Callback time: Recorded in metadata
+   - Reason: *"Person said call back in X"* (stored from voice)
+
+### Handling "We'll Send" Commitments
+
+**Scenario**: Hotel says *"We'll send the folio by tomorrow"* or *"via email in the morning"*
+
+**System Behavior**:
+
+1. **Pending Verification**:
+   - Mark record status: **Pending Verification - Hotel Committed**
+   - Set verification check time (e.g., 24 hours after call)
+
+2. **Automatic Verification**:
+   - At scheduled check time, system:
+     - Sends reminder email to hotel
+     - OR attempts follow-up call if email not received
+   - If folio received: Mark **Agreed to Send - Received**
+   - If no folio: Mark **Agreed to Send - Not Received** → Escalate
+
+### Status Outcomes - IVR/Voicemail Extended
+
+Updated status list including IVR scenarios:
+
+- **Could not connect** - No answer, line busy, failed to connect
+- **Voicemail - Message Left** - Reached voicemail, left detailed message
+- **Voicemail - No Message Left** - Reached voicemail, hung up per config
+- **Asked to try later - Callback Scheduled** - Person gave callback time/window
+- **Pending Verification - Hotel Committed** - Hotel said they'll send, awaiting receipt
+- **IVR Navigation Failed** - Could not navigate IVR successfully
+- **Reservation not found** - Hotel/person couldn't find reservation
+- **Agreed to send folio** - Hotel committed, will send to email
+- **Refused / cannot share** - Hotel declined
+- **Human follow-up required** - Escalation needed
+- **Sent via email** - Folio details sent via email (overflow from duration limit)
+
+### IVR Configuration Per Hotel
+
+**Hotel-Specific Settings**:
+
+- Hotel phone number
+- Known IVR menu structure (if available)
+- DTMF sequence to reach billing/folio department
+  - Example: "Press 2 → Press 1" for Hotel A
+  - Example: "Press 3" for Hotel B
+- Business hours for calling
+- Callback time constraints (e.g., "call back after 2 PM only")
+- Voicemail preference (leave message vs. hang up)
+- Language of IVR (for future multi-language support)
+
+**Learning/Adaptation**:
+- System can log successful navigation paths
+- Operators can update IVR sequences based on real calls
+- Configuration improves over time with successful calls
+
+
 
 #### Call Duration Management
 
@@ -85,14 +216,17 @@ For each folio request record, the system:
 
 After each call, the system updates each folio record with one of the following statuses:
 
-- **Could not connect** - No answer, line busy
-- **Voicemail** - Left with voicemail
-- **Asked to try later** - Callee requested callback (record callback window)
-- **Reservation not found** - Hotel couldn't find reservation
-- **Agreed to send folio** - Hotel committed to sending folio to email
-- **Refused / cannot share** - Hotel declined
-- **Human follow-up required** - Escalation needed
-- **Sent via email** - Folio details sent via email (overflow from duration limit)
+- **Could not connect** - No answer, line busy, failed to connect
+- **Voicemail - Message Left** - Reached voicemail, left detailed message with folio request
+- **Voicemail - No Message Left** - Reached voicemail, hung up per configuration
+- **IVR Navigation Failed** - Could not navigate IVR successfully to reach person
+- **Asked to try later - Callback Scheduled** - Person gave specific callback time/window; system will retry automatically
+- **Pending Verification - Hotel Committed** - Hotel said they'll send folio; awaiting receipt verification
+- **Reservation not found** - Hotel/person couldn't find reservation in their system
+- **Agreed to send folio** - Hotel committed to sending folio to provided email address
+- **Refused / cannot share** - Hotel declined to provide folio
+- **Human follow-up required** - Escalation needed due to complexity or system limitation
+- **Sent via email** - Folio details sent via email (overflow from call duration limit)
 
 ---
 
@@ -205,29 +339,14 @@ After each call, the system updates each folio record with one of the following 
 
 ---
 
-## Implementation Priorities
+## System Architecture & Logical Components
 
-### Phase 1 - Core
-- [ ] Record creation/import
-- [ ] Basic call batching by phone number
-- [ ] Call execution with oldest-first ordering
-- [ ] Status recording (basic outcomes)
-- [ ] Call recording storage
-- [ ] Status API endpoint
-
-### Phase 2 - Optimization & Guardrails
-- [ ] Call duration estimation and email overflow
-- [ ] Retry logic with spacing and caps
-- [ ] Concurrency limits
-- [ ] UI for status tracking
-- [ ] Basic escalation (human flag)
-
-### Phase 3 - Advanced
-- [ ] Real-time listening interface
-- [ ] Mid-call operator intervention
-- [ ] Advanced escalation workflows
-- [ ] Analytics dashboard
-- [ ] Compliance reporting
+See detailed logical architecture diagrams in [Folio-architecture.md](./Folio-architecture.md):
+- System Architecture (overall component relationships)
+- Critical Process Flow (call execution workflow with IVR handling)
+- IVR Handling Flow (detailed voice decision tree)
+- Component Interaction Flow (sequence of operations)
+- Record Lifecycle (record state transitions)
 
 ---
 
@@ -240,4 +359,7 @@ After each call, the system updates each folio record with one of the following 
 | Call duration overflow | Process oldest-first; if exceeds max, notify callee remaining sent via email |
 | Real-time listening | Separate operator interface + all calls recorded for analysis |
 | Mid-batch escalation | Either: (1) email remaining + continue, or (2) schedule callback + continue |
+| IVR handling | System detects IVR vs. human vs. voicemail; navigates IVR menus; leaves voicemail messages; parses callback timeframes |
+| Callback scheduling | Extracts callback time from voice responses; reschedules call at requested time; applies business hour rules |
+| Commitment verification | Tracks hotel commitments ("we'll send by EOD"); schedules verification check at expected delivery time |
 

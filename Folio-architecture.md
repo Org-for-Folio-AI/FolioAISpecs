@@ -1,35 +1,56 @@
-# Folio System - Architecture & Flow Diagrams
+# Folio System - Logical Architecture & Flows
+
+## Overview
+
+This document presents the logical architecture and process flows of the Folio automation system. These are conceptual diagrams for stakeholders to understand system components, interactions, and decision logic. This is **not** a technical implementation topology or system design specification.
+
+---
 
 ## System Architecture
+
+Logical view of system components and how they relate:
 
 ```mermaid
 graph TB
     subgraph Input["Input Layer"]
         A["Record Creation/Import"]
-        B["CSV/API Upload"]
+        B["Data Sources"]
     end
 
     subgraph Processing["Processing Layer"]
-        C["Scheduler<br/>Periodic pickup"]
-        D["Batching Engine<br/>Group by phone#"]
-        E["Call Duration<br/>Estimator"]
-        F["Call Engine<br/>Execute calls"]
+        C["Scheduler"]
+        D["Batching Engine"]
+        E["Call Optimizer"]
+        F["Call Handler"]
     end
 
-    subgraph Decision["Decision Layer"]
-        G["Escalation<br/>Handler"]
-        H["Overflow<br/>Detector"]
+    subgraph Intelligence["Intelligence Layer"]
+        F1["Connection Analyzer"]
+        F2["IVR Navigator"]
+        F3["Voice Analyzer"]
+        F4["Callback Parser"]
     end
 
-    subgraph Output["Output & Storage"]
-        I["Status Manager<br/>Update records"]
-        J["Recording Storage<br/>Call audio"]
-        K["Email Service<br/>Send overflow"]
+    subgraph Decision["Decision & Action Layer"]
+        G["Escalation Logic"]
+        H["Overflow Handler"]
+        I1["Callback Manager"]
     end
 
-    subgraph Interfaces["User Interfaces"]
-        L["API/UI<br/>Status & Audit"]
-        M["Real-Time Listening<br/>Operator Interface"]
+    subgraph Storage["Data Layer"]
+        I2["Hotel Configuration"]
+        J["Call Recordings"]
+        K1["Scheduling Queue"]
+    end
+
+    subgraph Output["Output & Notifications"]
+        I["Status Manager"]
+        K["Notification Service"]
+    end
+
+    subgraph Access["Access & Visibility"]
+        L["Status API & UI"]
+        M["Operator Interface"]
     end
 
     A --> C
@@ -37,17 +58,28 @@ graph TB
     C --> D
     D --> E
     E --> F
-    F --> G
-    F --> H
+    F --> F1
+    F1 -->|Human| G
+    F1 -->|IVR| F2
+    F1 -->|Voicemail| F3
+    F2 --> I2
+    F2 --> G
+    F3 --> F4
+    F4 --> I1
+    F3 --> G
+    F4 --> I1
+    I1 --> K1
     G --> M
     G --> I
     H --> K
+    F --> H
     F --> I
     F --> J
     I --> L
     J --> L
     J --> M
     K --> I
+    K1 --> C
 
     style A fill:#e1f5ff
     style B fill:#e1f5ff
@@ -55,131 +87,272 @@ graph TB
     style D fill:#fff3e0
     style E fill:#fff3e0
     style F fill:#fff3e0
+    style F1 fill:#ffe0b2
+    style F2 fill:#ffe0b2
+    style F3 fill:#ffe0b2
+    style F4 fill:#ffe0b2
     style G fill:#f3e5f5
     style H fill:#f3e5f5
+    style I1 fill:#f3e5f5
+    style I2 fill:#bbdefb
     style I fill:#e8f5e9
     style J fill:#e8f5e9
     style K fill:#e8f5e9
+    style K1 fill:#e8f5e9
     style L fill:#fce4ec
     style M fill:#fce4ec
 ```
 
+### Component Descriptions
+
+- **Scheduler**: Picks up new records on defined intervals
+- **Batching Engine**: Groups records by hotel phone number
+- **Call Optimizer**: Estimates call duration and determines request strategy
+- **Call Handler**: Manages the actual communication with hotels
+- **Connection Analyzer**: Determines if connection is with person, IVR system, or voicemail
+- **IVR Navigator**: Handles navigation of automated phone systems
+- **Voice Analyzer**: Analyzes spoken responses and voicemail
+- **Callback Parser**: Extracts timing information from callback requests
+- **Escalation Logic**: Routes complex cases to human operators
+- **Overflow Handler**: Manages requests that exceed call duration limits
+- **Callback Manager**: Schedules and tracks follow-up calls
+- **Status Manager**: Updates record status based on call outcomes
+- **Notification Service**: Sends emails and notifications
+- **Call Recordings**: Stores and makes available all call audio
+- **Hotel Configuration**: Stores hotel-specific details (IVR paths, business hours, preferences)
+- **Scheduling Queue**: Maintains callbacks and verification checks
+- **Status API & UI**: Provides visibility to staff and operators
+- **Operator Interface**: Allows real-time listening and intervention
+
+---
+
 ## Critical Process Flow
+
+How the system processes folio requests from start to finish:
 
 ```mermaid
 flowchart TD
-    Start([New Folio Records Created]) --> Schedule["Scheduler<br/>triggers on interval"]
+    Start([New Folio Records]) --> Schedule["Scheduler picks up<br/>new records"]
 
-    Schedule --> Fetch["Fetch all NEW records<br/>from queue"]
-    Fetch --> Group["Group records<br/>by hotel phone#"]
+    Schedule --> Fetch["Fetch records from<br/>input queue"]
+    Fetch --> Group["Group by hotel<br/>phone number"]
 
-    Group --> Batch{Records in<br/>this batch?}
-    Batch -->|Yes| Estimate["Estimate call duration<br/>for all folios"]
-    Batch -->|No| End1([Complete])
+    Group --> Batch{Records to<br/>process?}
+    Batch -->|No| End1([Cycle complete])
+    Batch -->|Yes| Estimate["Estimate total time<br/>for batch"]
 
-    Estimate --> DurationCheck{Estimated time<br/>≤ Max duration?}
+    Estimate --> DurationCheck{Time fits<br/>in limit?}
 
-    DurationCheck -->|Yes| CallAll["Call hotel<br/>Request all folios<br/>Oldest-first ordering"]
-    DurationCheck -->|No| CallPartial["Call hotel<br/>Request folios oldest-first<br/>until approaching max duration"]
+    DurationCheck -->|Yes| CallHotel["Call hotel"]
+    DurationCheck -->|No| PlanOverflow["Plan to send<br/>overflow via email"]
 
-    CallAll --> Result1["All folios requested<br/>in call"]
-    CallPartial --> NotifyEmail["Notify callee:<br/>Remaining details via email"]
-    NotifyEmail --> EmailQueue["Queue remaining folios<br/>for email send"]
+    CallHotel --> DetectConn{What<br/>answered?}
+    PlanOverflow --> CallHotel
 
-    Result1 --> CallExecution{During call:<br/>Escalation<br/>needed?}
-    CallPartial --> CallExecution
+    DetectConn -->|No answer| NoConn["Record: Could not connect<br/>Schedule retry"]
+    DetectConn -->|Voicemail| VMBranch["Voicemail branch"]
+    DetectConn -->|IVR Menu| IVRBranch["IVR branch"]
+    DetectConn -->|Human| HumanBranch["Human branch"]
 
-    CallExecution -->|Yes| EscalationChoice{Which escalation<br/>option?}
-    CallExecution -->|No| RecordStatus["Record final status<br/>for each folio"]
+    VMBranch --> VMChoice{Action}
+    VMChoice -->|Leave message| LeaveMsg["Record message<br/>with folio details"]
+    VMChoice -->|Hang up| HangVM["Disconnect"]
+    LeaveMsg --> VMStatus["Record: VM - Message Left<br/>Schedule retry"]
+    HangVM --> VMStatus2["Record: VM - No Message<br/>Schedule retry"]
 
-    EscalationChoice -->|Option 1<br/>Email overflow| Escalate1["Route to operator<br/>Promise email for this folio<br/>Continue with next folios"]
-    EscalationChoice -->|Option 2<br/>Schedule callback| Escalate2["Route to operator<br/>Inform callee new call will be arranged<br/>Continue with next folios"]
+    IVRBranch --> CheckConfig["Check hotel IVR<br/>configuration"]
+    CheckConfig --> Navigate["Navigate menu<br/>to reach billing"]
+    Navigate --> NavSuccess{Reached<br/>person?}
+    NavSuccess -->|No| IVRFail["Record: IVR Navigation Failed<br/>Escalate"]
+    NavSuccess -->|Yes| HumanBranch
 
-    Escalate1 --> RecordStatus
-    Escalate2 --> RecordStatus
+    HumanBranch --> RequestFolio["Request folio<br/>Guest info + Email"]
+    RequestFolio --> AnalyzeResponse["Analyze response"]
+    AnalyzeResponse --> ResponseType{Response<br/>type?}
 
-    RecordStatus --> RecordAudio["Store call recording<br/>Reference with all folios"]
-    RecordAudio --> SendEmail{Email queue<br/>has items?}
+    ResponseType -->|Agreed| AgreedStatus["Record: Agreed to send"]
+    ResponseType -->|Not found| NotFound["Record: Reservation not found"]
+    ResponseType -->|Refused| Refused["Record: Refused"]
+    ResponseType -->|Call back| CallbackBranch["Extract callback time<br/>Schedule follow-up"]
+    ResponseType -->|We'll send| CommitBranch["Record commitment<br/>Schedule verification"]
 
-    SendEmail -->|Yes| Email["Send email to hotel<br/>with folio details<br/>for remaining cases"]
-    SendEmail -->|No| UpdateUI["Update Status API/UI<br/>with final outcomes"]
+    NoConn --> CheckMore{More folios<br/>in batch?}
+    VMStatus --> CheckMore
+    VMStatus2 --> CheckMore
+    IVRFail --> CheckMore
+    AgreedStatus --> CheckMore
+    NotFound --> CheckMore
+    Refused --> CheckMore
+    CallbackBranch --> CheckMore
+    CommitBranch --> CheckMore
 
-    Email --> UpdateUI
-    UpdateUI --> Batch
+    CheckMore -->|Yes| RequestFolio
+    CheckMore -->|No| FinalSteps["Record call audio<br/>Update all records"]
+
+    FinalSteps --> EmailCheck{Overflow<br/>to send?}
+    EmailCheck -->|Yes| SendEmail["Send remaining folio<br/>details via email"]
+    EmailCheck -->|No| Complete["Mark batch complete"]
+
+    SendEmail --> Complete
+    Complete --> Group
 ```
 
-## Component Interaction Flow
+---
+
+## IVR & Voicemail Handling
+
+How the system handles automated phone systems and voicemail:
 
 ```mermaid
-sequenceDiagram
-    participant API as API/UI
-    participant Scheduler as Scheduler
-    participant Batch as Batching Engine
-    participant CallEngine as Call Engine
-    participant Hotel as Hotel System
-    participant Operator as Operator
-    participant Storage as Recording Storage
-    participant Email as Email Service
+flowchart TD
+    Connected["Connected to hotel"] --> Detect{What is<br/>the connection?}
 
-    API->>Scheduler: New folio records created
-    Scheduler->>Batch: Trigger batch processing
-    Batch->>Batch: Group by phone number
-    Batch->>CallEngine: Execute batch A (Hotel 1)
-    CallEngine->>Hotel: Initiate call
-    Hotel-->>CallEngine: Connected
+    Detect -->|IVR| IVRPath["IVR System Detected"]
+    Detect -->|Voicemail| VMPath["Voicemail Detected"]
+    Detect -->|Human| HumanPath["Human Detected"]
 
-    Note over CallEngine,Hotel: Request folio 1 (oldest)
-    CallEngine->>Hotel: Guest John Doe, Conf#123, send to john@example.com
-    Hotel-->>CallEngine: Acknowledged
+    IVRPath --> LoadIVR["Load hotel IVR profile<br/>from configuration"]
+    LoadIVR --> SendNav["Send navigation input<br/>to reach billing/folio dept"]
+    SendNav --> ListenForResponse["Listen for response<br/>or next menu prompt"]
+    ListenForResponse --> MenuProgress{Progressed<br/>toward goal?}
+    MenuProgress -->|No| NavFailed["Navigation failed<br/>Escalate to operator"]
+    MenuProgress -->|Retry| SendNav
+    MenuProgress -->|Success| HumanPath
 
-    Note over CallEngine,Hotel: Request folio 2
-    CallEngine->>Hotel: Guest Jane Smith, Conf#456, send to jane@example.com
-    Hotel-->>CallEngine: Escalation request needed
+    VMPath --> CheckVMPolicy["Check hotel policy<br/>for voicemail handling"]
+    CheckVMPolicy --> LeaveMsg{Leave message<br/>or hang up?}
+    LeaveMsg -->|Leave Message| RecMsg["Record voicemail message<br/>with folio request details<br/>+ email address + reference ID"]
+    LeaveMsg -->|Hang Up| Disconnect["Disconnect without<br/>leaving message"]
+    RecMsg --> VMDone["Mark: Voicemail-Message Left<br/>Schedule retry"]
+    Disconnect --> VMDone2["Mark: Voicemail-No Message<br/>Schedule retry"]
 
-    CallEngine->>Operator: Escalation routed
-    Operator-->>CallEngine: Handled - continue
+    HumanPath --> Converse["Request folio details:<br/>Guest name, confirmation #<br/>Destination email"]
+    Converse --> HumanResponse["Hotel responds"]
+    HumanResponse --> RespType{What did<br/>they say?}
 
-    Note over CallEngine,Hotel: Request folio 3
-    CallEngine->>Hotel: Guest Bob Brown, Conf#789, send to bob@example.com
-    Hotel-->>CallEngine: Agreed, will send
+    RespType -->|Yes, will send| Agreement["Mark: Agreed to send folio"]
+    RespType -->|Reservation<br/>not found| NotInSystem["Mark: Reservation not found"]
+    RespType -->|Cannot<br/>provide| Decline["Mark: Refused"]
+    RespType -->|Call back<br/>later| ExtractTime["Extract timing information<br/>from spoken response"]
+    RespType -->|We'll send<br/>by X time| ExtractComm["Extract commitment details<br/>from spoken response"]
 
-    CallEngine->>Storage: Store call recording
-    Storage-->>CallEngine: Stored, reference ID
+    ExtractTime --> ParseTime["Parse callback timeframe<br/>e.g., '2 hours', 'tomorrow', 'next week'"]
+    ParseTime --> ScheduleCallback["Schedule follow-up call<br/>at requested time"]
+    ScheduleCallback --> CBDone["Mark: Callback Scheduled<br/>Add to callback queue"]
 
-    CallEngine->>Email: Send folio 2 details via email
-    Email-->>Hotel: Email sent
+    ExtractComm --> ParseComm["Parse commitment deadline<br/>e.g., 'EOD today', 'tomorrow morning'"]
+    ParseComm --> ScheduleVerify["Schedule verification check<br/>at expected delivery time"]
+    ScheduleVerify --> CommDone["Mark: Pending Verification<br/>Add to verification queue"]
 
-    CallEngine->>API: Update statuses<br/>Folio 1: Sent<br/>Folio 2: Escalated/Email<br/>Folio 3: Agreed
-    API-->>API: Update UI with results
+    NavFailed --> Escalate["Escalate to operator<br/>for manual handling"]
+    VMDone --> Exit["Done - Record complete"]
+    VMDone2 --> Exit
+    Agreement --> Exit
+    NotInSystem --> Exit
+    Decline --> Exit
+    CBDone --> Exit
+    CommDone --> Exit
+    Escalate --> Exit
 ```
 
-## Data Flow - Record Lifecycle
+---
+
+## Record Lifecycle
+
+How a folio request record progresses through the system:
 
 ```mermaid
 graph LR
-    R["Folio Request<br/>Record"]
+    R["Folio Request<br/>Record Created"]
 
-    R -->|Status: NEW| Scheduler["Scheduler<br/>picks up"]
-    Scheduler -->|Status: QUEUED| Batch["Batching<br/>Engine"]
-    Batch -->|Status: SCHEDULED| Call["Call<br/>Engine"]
-    Call -->|Status: IN_CALL| Result{Call<br/>Outcome}
+    R -->|NEW| Sched["Scheduler<br/>picks up"]
+    Sched -->|QUEUED| Batch["Batching<br/>Engine"]
+    Batch -->|SCHEDULED| Call["Call<br/>Handler"]
+    Call -->|IN_CALL| Process{Outcome}
 
-    Result -->|Success| Status1["Status: AGREED_TO_SEND<br/>+ Recording ref"]
-    Result -->|Not found| Status2["Status: RESERVATION_NOT_FOUND<br/>+ Recording ref"]
-    Result -->|Refused| Status3["Status: REFUSED<br/>+ Recording ref"]
-    Result -->|Escalation| Status4["Status: ESCALATED<br/>+ Operator notes<br/>+ Recording ref"]
-    Result -->|Duration overflow| Status5["Status: SENT_VIA_EMAIL<br/>+ Email timestamp<br/>+ Recording ref"]
+    Process -->|Human agreed| S1["AGREED_TO_SEND"]
+    Process -->|Not in system| S2["RESERVATION_NOT_FOUND"]
+    Process -->|Refused| S3["REFUSED"]
+    Process -->|Needs operator| S4["ESCALATED"]
+    Process -->|Too long| S5["SENT_VIA_EMAIL"]
+    Process -->|Voicemail+msg| S6["VOICEMAIL_MESSAGE_LEFT"]
+    Process -->|Voicemail-no msg| S7["VOICEMAIL_NO_MESSAGE"]
+    Process -->|IVR failed| S8["IVR_NAVIGATION_FAILED"]
+    Process -->|Callback| S9["CALLBACK_SCHEDULED"]
+    Process -->|Commitment| S10["PENDING_VERIFICATION"]
 
-    Status1 --> Final["FINAL STATUS<br/>Record complete<br/>Stored in database"]
-    Status2 --> Final
-    Status3 --> Final
-    Status4 --> Final
-    Status5 --> Final
+    S1 --> Final["FINAL STATUS<br/>Record complete<br/>Stored in system"]
+    S2 --> Final
+    S3 --> Final
+    S4 --> Final
+    S5 --> Final
+    S8 --> Final
 
-    Final --> UI["Accessible via<br/>Status API/UI"]
+    S6 --> Retry["Scheduled for<br/>automatic retry<br/>at later time"]
+    S7 --> Retry
+    S9 --> Reschedule["Rescheduled record<br/>in callback queue<br/>Re-enters at<br/>target time"]
+    S10 --> Verify["Verification scheduled<br/>Check if folio<br/>was received"]
+
+    Retry -->|Retry time| Sched
+    Reschedule -->|Callback time| Sched
+    Verify -->|Verification time| Sched
+    Final --> UI["Accessible via<br/>Status API & UI"]
 
     style R fill:#e3f2fd
     style Final fill:#c8e6c9
+    style Retry fill:#fff3e0
+    style Reschedule fill:#fff3e0
+    style Verify fill:#fff3e0
     style UI fill:#fff9c4
+```
+
+---
+
+## Component Interaction Sequence
+
+Example of how components interact during a typical call:
+
+```mermaid
+sequenceDiagram
+    participant UI as User/System
+    participant Sched as Scheduler
+    participant Batch as Batching<br/>Engine
+    participant Call as Call<br/>Handler
+    participant Hotel as Hotel
+    participant Operator as Operator
+    participant Store as Storage
+    participant Alert as Notification
+
+    UI->>Sched: Records imported
+    Sched->>Batch: Process batch
+    Batch->>Batch: Group by phone
+    Batch->>Call: Execute call to Hotel A
+    Call->>Hotel: Initiate call
+    Hotel-->>Call: Connected
+
+    Note over Call,Hotel: Request Folio #1
+    Call->>Hotel: Guest John, Conf 123, email
+    Hotel-->>Call: OK, will send
+
+    Note over Call,Hotel: Request Folio #2
+    Call->>Hotel: Guest Jane, Conf 456, email
+    Hotel-->>Call: Need supervisor
+    Call->>Operator: Escalation needed
+    Operator-->>Call: Handling it
+    Call->>Hotel: Continuing...
+
+    Note over Call,Hotel: Request Folio #3
+    Call->>Hotel: Guest Bob, Conf 789, email
+    Hotel-->>Call: Will try in 2 hours
+    Call->>Call: Extract callback time
+
+    Call->>Store: Save recording
+    Store-->>Call: Stored
+    Call->>Store: Update record statuses
+    Call->>Alert: Send notifications
+    Alert-->>UI: Status updated
+
+    Operator->>UI: View call recording
+    UI-->>Operator: Recording available
 ```
 
