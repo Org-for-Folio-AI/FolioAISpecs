@@ -83,9 +83,9 @@ flowchart TD
     Error --> Done["Done"]
     Return --> Done
 
-    style Start fill:#e3f2fd
-    style Return fill:#c8e6c9
-    style Error fill:#ffcdd2
+    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style Return stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style Error stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
 ```
 
 ## Email Template System
@@ -191,9 +191,9 @@ flowchart TD
     Success --> Done
     Error --> Done
 
-    style Start fill:#e3f2fd
-    style Success fill:#c8e6c9
-    style Error fill:#ffcdd2
+    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style Success stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style Error stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
 ```
 
 ## Configuration

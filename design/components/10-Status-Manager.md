@@ -92,11 +92,11 @@ graph TD
     PARTIAL --> COMPLETED
     EXTRACT_FAIL --> COMPLETED
 
-    style NEW fill:#e3f2fd
-    style COMPLETED fill:#c8e6c9
-    style IN_CALL fill:#fff9c4
-    style AGREED fill:#c8e6c9
-    style FOLIO_REC fill:#c8e6c9
+    style NEW stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style COMPLETED stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style IN_CALL stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style AGREED stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style FOLIO_REC stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
 ```
 
 ## Event-to-Status Mapping

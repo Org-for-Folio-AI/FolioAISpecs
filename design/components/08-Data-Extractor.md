@@ -89,10 +89,10 @@ flowchart TD
     Partial --> Done
     Manual --> Done
 
-    style Start fill:#e3f2fd
-    style Success fill:#c8e6c9
-    style Partial fill:#fff9c4
-    style Failed fill:#ffcdd2
+    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style Success stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style Partial stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style Failed stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
 ```
 
 ## Extraction Templates

@@ -77,11 +77,11 @@ flowchart TD
     Emit3 --> Sleep["Sleep until next interval"]
     Sleep --> Loop
 
-    style Start fill:#e3f2fd
-    style Loop fill:#fff9c4
-    style Emit1 fill:#c8e6c9
-    style Emit2 fill:#c8e6c9
-    style Emit3 fill:#c8e6c9
+    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style Loop stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style Emit1 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style Emit2 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style Emit3 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
 ```
 
 ## Internal State Management

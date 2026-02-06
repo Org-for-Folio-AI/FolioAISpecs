@@ -82,10 +82,10 @@ flowchart TD
 
     EmitSchedule --> Done
 
-    style Start fill:#e3f2fd
-    style Estimate fill:#fff9c4
-    style Overflow fill:#ffccbc
-    style EmitBatch fill:#c8e6c9
+    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style Estimate stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style Overflow stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style EmitBatch stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
 ```
 
 ## Duration Estimation Model

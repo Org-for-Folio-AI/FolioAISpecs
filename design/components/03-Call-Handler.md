@@ -86,10 +86,10 @@ graph TD
     O --> Q
     E --> Q
 
-    style A fill:#e3f2fd
-    style Q fill:#c8e6c9
-    style E fill:#ffcdd2
-    style K fill:#ffcdd2
+    style A stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style Q stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style E stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style K stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
 ```
 
 ## Call Execution Flow
@@ -164,10 +164,10 @@ flowchart TD
     Emit2 --> Callback
     Emit2 --> Failed
 
-    style Start fill:#e3f2fd
-    style Emit2 fill:#c8e6c9
-    style Failed fill:#ffcdd2
-    style Callback fill:#fff9c4
+    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style Emit2 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style Failed stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style Callback stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
 ```
 
 ## Call Configuration

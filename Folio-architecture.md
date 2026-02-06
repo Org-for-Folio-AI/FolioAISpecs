@@ -92,29 +92,29 @@ graph TB
     J --> M
     E2 --> E3
 
-    style A fill:#e1f5ff
-    style B fill:#e1f5ff
-    style C fill:#fff3e0
-    style D fill:#fff3e0
-    style E fill:#fff3e0
-    style F fill:#fff3e0
-    style F1 fill:#ffe0b2
-    style F2 fill:#ffe0b2
-    style F3 fill:#ffe0b2
-    style F4 fill:#ffe0b2
-    style E1 fill:#c8e6c9
-    style E2 fill:#c8e6c9
-    style E3 fill:#c8e6c9
-    style G fill:#f3e5f5
-    style H fill:#f3e5f5
-    style I1 fill:#f3e5f5
-    style I2 fill:#bbdefb
-    style I fill:#e8f5e9
-    style J fill:#e8f5e9
-    style K fill:#e8f5e9
-    style K1 fill:#e8f5e9
-    style L fill:#fce4ec
-    style M fill:#fce4ec
+    style A stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style B stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style C stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style D stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style E stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style F stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style F1 stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
+    style F2 stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
+    style F3 stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
+    style F4 stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
+    style E1 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style E2 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style E3 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style G stroke:#7b1fa2,fill:#f5f5f5,stroke-width:2px
+    style H stroke:#7b1fa2,fill:#f5f5f5,stroke-width:2px
+    style I1 stroke:#7b1fa2,fill:#f5f5f5,stroke-width:2px
+    style I2 stroke:#0097a7,fill:#f5f5f5,stroke-width:2px
+    style I stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style J stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style K stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style K1 stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style L stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
+    style M stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
 ```
 
 ### Component Descriptions

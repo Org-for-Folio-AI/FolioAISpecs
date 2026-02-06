@@ -107,9 +107,9 @@ flowchart TD
     Complete --> Sleep2["Sleep until<br/>next check"]
     Sleep2 --> Start
 
-    style Start fill:#e3f2fd
-    style Complete fill:#c8e6c9
-    style Error fill:#ffcdd2
+    style Start stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style Complete stroke:#388e3c,fill:#f5f5f5,stroke-width:2px
+    style Error stroke:#d32f2f,fill:#f5f5f5,stroke-width:2px
 ```
 
 ## Email Correlation Logic

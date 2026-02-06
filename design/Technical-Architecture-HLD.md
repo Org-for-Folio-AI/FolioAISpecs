@@ -109,10 +109,10 @@ graph TB
     Batcher -.reads.-> EventStore
     CallHandler -.reads.-> ConfigStore
 
-    style EventStore fill:#e8f5e9
-    style IVoiceLLM fill:#fff9c4
-    style ITelephony fill:#fff9c4
-    style IEmail fill:#fff9c4
+    style EventStore stroke:#7b1fa2,fill:#f5f5f5,stroke-width:2px
+    style IVoiceLLM stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
+    style ITelephony stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
+    style IEmail stroke:#fbc02d,fill:#f5f5f5,stroke-width:2px
 ```
 
 ---
@@ -177,8 +177,8 @@ graph TB
     SM --> ES
     ES --> S
 
-    style SingleProcess fill:#e3f2fd
-    style InMemory fill:#fff3e0
+    style SingleProcess stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style InMemory stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
 ```
 
 **Characteristics:**
@@ -248,9 +248,9 @@ graph TB
     StatusSvc --> EventTopic
     EventTopic --> SchedulerSvc
 
-    style Services fill:#e1f5ff
-    style MessageBroker fill:#fff3e0
-    style DataLayer fill:#e8f5e9
+    style Services stroke:#1976d2,fill:#f5f5f5,stroke-width:2px
+    style MessageBroker stroke:#f57c00,fill:#f5f5f5,stroke-width:2px
+    style DataLayer stroke:#7b1fa2,fill:#f5f5f5,stroke-width:2px
 ```
 
 **Characteristics:**
