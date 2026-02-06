@@ -11,6 +11,20 @@ A system that automates folio (invoice) retrieval from hotels by:
 
 ---
 
+## Technical Architecture & Implementation
+
+For detailed technical architecture, component interfaces, event schemas, and deployment models, see the design documentation in the `design/` directory:
+
+- **[Folio-technical-architecture.md](./Folio-technical-architecture.md)** - Main technical architecture document with system overview, short-term and long-term architectures, component interfaces, and provider abstractions
+- **[design/Technical-Architecture-HLD.md](./design/Technical-Architecture-HLD.md)** - Comprehensive high-level design (HLD) with detailed architectural principles, component interactions, and state management via event sourcing
+- **[design/Event-Catalog.md](./design/Event-Catalog.md)** - Complete catalog of all events (40+) with schemas, event flow, and aggregate boundaries
+- **[design/components/](./design/components/)** - Individual component design documents (10 components):
+  - 01-Scheduler.md, 02-Batching-Engine.md, 03-Call-Handler.md, 04-IVR-Navigator.md, 05-Voice-Analyzer.md
+  - 06-Email-Composer.md, 07-Email-Monitor.md, 08-Data-Extractor.md, 09-Callback-Manager.md, 10-Status-Manager.md
+- **[design/README.md](./design/README.md)** - Navigation guide for design documents with architecture principles and design decisions
+
+---
+
 ## System Scope
 
 ### What the System Does
