@@ -48,6 +48,12 @@ graph TB
         K["Notification Service"]
     end
 
+    subgraph Email["Email Layer"]
+        E1["Email Composer"]
+        E2["Email Monitor"]
+        E3["Data Extractor"]
+    end
+
     subgraph Access["Access & Visibility"]
         L["Status API & UI"]
         M["Operator Interface"]
@@ -68,18 +74,23 @@ graph TB
     F4 --> I1
     F3 --> G
     F4 --> I1
+    H --> E1
+    E1 --> K
+    E1 --> I2
+    E2 --> E3
+    E3 --> I
     I1 --> K1
     G --> M
     G --> I
-    H --> K
+    K --> I
+    K1 --> C
     F --> H
     F --> I
     F --> J
     I --> L
     J --> L
     J --> M
-    K --> I
-    K1 --> C
+    E2 --> E3
 
     style A fill:#e1f5ff
     style B fill:#e1f5ff
@@ -91,6 +102,9 @@ graph TB
     style F2 fill:#ffe0b2
     style F3 fill:#ffe0b2
     style F4 fill:#ffe0b2
+    style E1 fill:#c8e6c9
+    style E2 fill:#c8e6c9
+    style E3 fill:#c8e6c9
     style G fill:#f3e5f5
     style H fill:#f3e5f5
     style I1 fill:#f3e5f5
@@ -105,24 +119,27 @@ graph TB
 
 ### Component Descriptions
 
-- **Scheduler**: Picks up new records on defined intervals
+- **Scheduler**: Picks up new records on defined intervals; triggers calls and email requests
 - **Batching Engine**: Groups records by hotel phone number
 - **Call Optimizer**: Estimates call duration and determines request strategy
-- **Call Handler**: Manages the actual communication with hotels
+- **Call Handler**: Manages the actual communication with hotels via phone
 - **Connection Analyzer**: Determines if connection is with person, IVR system, or voicemail
 - **IVR Navigator**: Handles navigation of automated phone systems
 - **Voice Analyzer**: Analyzes spoken responses and voicemail
 - **Callback Parser**: Extracts timing information from callback requests
 - **Escalation Logic**: Routes complex cases to human operators
-- **Overflow Handler**: Manages requests that exceed call duration limits
+- **Overflow Handler**: Manages requests that exceed call duration limits; routes to email
 - **Callback Manager**: Schedules and tracks follow-up calls
-- **Status Manager**: Updates record status based on call outcomes
+- **Email Composer**: Creates and sends folio request emails to hotels
+- **Email Monitor**: Monitors client email inbox for hotel responses
+- **Data Extractor**: Extracts folio/billing information from email responses; parses attachments
+- **Status Manager**: Updates record status based on call and email outcomes
 - **Notification Service**: Sends emails and notifications
 - **Call Recordings**: Stores and makes available all call audio
-- **Hotel Configuration**: Stores hotel-specific details (IVR paths, business hours, preferences)
-- **Scheduling Queue**: Maintains callbacks and verification checks
+- **Hotel Configuration**: Stores hotel-specific details (IVR paths, email addresses, preferences)
+- **Scheduling Queue**: Maintains callbacks, verification checks, and email response timeouts
 - **Status API & UI**: Provides visibility to staff and operators
-- **Operator Interface**: Allows real-time listening and intervention
+- **Operator Interface**: Allows real-time listening, intervention, and manual folio extraction review
 
 ---
 
@@ -189,11 +206,24 @@ flowchart TD
     CheckMore -->|Yes| RequestFolio
     CheckMore -->|No| FinalSteps["Record call audio<br/>Update all records"]
 
-    FinalSteps --> EmailCheck{Overflow<br/>to send?}
-    EmailCheck -->|Yes| SendEmail["Send remaining folio<br/>details via email"]
+    FinalSteps --> EmailCheck{Overflow<br/>or email<br/>needed?}
+    EmailCheck -->|Yes| SendEmail["Compose & send folio<br/>request email to hotel<br/>From: Client email"]
     EmailCheck -->|No| Complete["Mark batch complete"]
 
-    SendEmail --> Complete
+    SendEmail --> EmailMonitor["Add to email<br/>monitoring queue"]
+    EmailMonitor --> WaitResponse["Monitor client inbox<br/>for hotel response"]
+    WaitResponse --> ResponseReceived{Response<br/>received?}
+
+    ResponseReceived -->|Yes| ExtractData["Extract folio/billing<br/>information from email"]
+    ResponseReceived -->|No| Timeout["Timeout - mark<br/>as no response<br/>Escalate"]
+
+    ExtractData --> ExtractionSuccess{Data<br/>extracted<br/>successfully?}
+    ExtractionSuccess -->|Yes| RecordExtracted["Record: Folio Received - Email<br/>Store extracted data"]
+    ExtractionSuccess -->|No| ManualReview["Record: Unable to Extract<br/>Route to operator<br/>for manual review"]
+
+    RecordExtracted --> Complete
+    ManualReview --> Complete
+    Timeout --> Complete
     Complete --> Group
 ```
 
@@ -253,6 +283,51 @@ flowchart TD
     CBDone --> Exit
     CommDone --> Exit
     Escalate --> Exit
+```
+
+---
+
+## Email-Based Folio Request Flow
+
+How the system handles email-based folio requests and response extraction:
+
+```mermaid
+flowchart TD
+    Trigger["Email path needed<br/>or triggered"] --> Compose["Compose email:<br/>Guest name, Conf#<br/>Check-in/Check-out dates<br/>Folio request details"]
+
+    Compose --> SendEmail["Send email<br/>From: Client email address<br/>To: Hotel email address"]
+    SendEmail --> EnterMonitor["Enter email monitoring<br/>queue with timeout"]
+
+    EnterMonitor --> Monitor["Monitor client email inbox<br/>for responses"]
+    Monitor --> CheckResponse{Hotel<br/>response<br/>received?}
+
+    CheckResponse -->|No| WaitMore["Continue monitoring"]
+    WaitMore --> TimeoutCheck{Timeout<br/>exceeded?}
+    TimeoutCheck -->|No| CheckResponse
+    TimeoutCheck -->|Yes| NoResponse["Record: Email - No Response<br/>Escalate to operator"]
+
+    CheckResponse -->|Yes| ReceiveEmail["Email received<br/>from hotel"]
+    ReceiveEmail --> AnalyzeContent["Analyze email<br/>Check for attachments<br/>Review body content"]
+
+    AnalyzeContent --> HasAttachment{Attachment<br/>present?}
+    HasAttachment -->|Yes| ParseDoc["Parse attachment<br/>PDF/Image/Document<br/>OCR if needed"]
+    HasAttachment -->|No| ParseBody["Parse email body<br/>Look for folio details"]
+
+    ParseDoc --> ExtractFields["Extract fields:<br/>Folio number<br/>Guest name verification<br/>Room number<br/>Check-in/Check-out<br/>Charges/Amounts<br/>Payment terms"]
+
+    ParseBody --> ExtractFields
+    ExtractFields --> ValidationCheck{All required<br/>fields<br/>extracted?}
+
+    ValidationCheck -->|Yes| Success["Record: Folio Received - Email<br/>Store extracted data<br/>Link to email"]
+    ValidationCheck -->|No| PartialSuccess{Some fields<br/>extracted?}
+
+    PartialSuccess -->|Yes| Partial["Record: Partial Data Extracted<br/>Store what was extracted<br/>Flag for review"]
+    PartialSuccess -->|No| Failed["Record: Unable to Extract<br/>Escalate to operator<br/>Store raw email for manual review"]
+
+    Success --> Complete["Mark record complete<br/>Update status visible to stakeholders"]
+    Partial --> Complete
+    Failed --> Complete
+    NoResponse --> Complete
 ```
 
 ---

@@ -37,12 +37,19 @@ For each folio request record, the system:
 | Check-in Date | Date | Reservation period |
 | Check-out Date | Date | Reservation period |
 | Hotel Phone Number | String | Calling target; used for batching |
-| Destination Email | Email | **REQUIRED** - Where callee sends folio; provided to callee during call |
+
+### System Configuration (Per Client)
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| Client Email Address | Email | **REQUIRED** - From address for email requests; where hotel responds; system monitors this inbox |
+| Hotel Destination Email | Email | Optional - Hotel's email where system sends folio request details if needed |
 
 ### Optional Input Fields
 
 - Hotel Name
 - Hotel Address
+- Hotel Email Address (if known in advance)
 
 ---
 
@@ -65,9 +72,20 @@ For each folio request record, the system:
 3. If connected to person:
    - For each batched folio request (oldest first):
      - Request folio for [Guest Name] + [Reservation #]
-     - Provide destination email address to callee
-   - Callee commits to sending folio to provided email
+   - Callee commits to sending folio
 4. System records the status and updates each record
+
+#### Email Alternative/Overflow Channel
+When call is not feasible or as overflow from call duration limits:
+1. System sends email to hotel's email address with:
+   - Guest name, confirmation number, check-in/check-out dates
+   - Request for folio/invoice details
+   - **From address**: Client email (where hotel should respond)
+2. Hotel receives request and responds to client email address
+3. System monitors client email inbox
+4. System receives response and extracts folio/billing information
+5. System parses extracted data and updates folio record with details
+6. Records status as "Folio Received - Email"
 
 ---
 
@@ -214,19 +232,92 @@ Updated status list including IVR scenarios:
 
 ### Status Outcomes
 
-After each call, the system updates each folio record with one of the following statuses:
+After each call or email interaction, the system updates each folio record with one of the following statuses:
 
+**From Call Interactions:**
 - **Could not connect** - No answer, line busy, failed to connect
 - **Voicemail - Message Left** - Reached voicemail, left detailed message with folio request
 - **Voicemail - No Message Left** - Reached voicemail, hung up per configuration
 - **IVR Navigation Failed** - Could not navigate IVR successfully to reach person
 - **Asked to try later - Callback Scheduled** - Person gave specific callback time/window; system will retry automatically
-- **Pending Verification - Hotel Committed** - Hotel said they'll send folio; awaiting receipt verification
+- **Pending Verification - Hotel Committed** - Hotel said they'll send folio via email; awaiting receipt
 - **Reservation not found** - Hotel/person couldn't find reservation in their system
-- **Agreed to send folio** - Hotel committed to sending folio to provided email address
+- **Agreed to send folio** - Hotel committed to sending folio
 - **Refused / cannot share** - Hotel declined to provide folio
+- **Sent via email - Overflow** - Folio request sent via email (overflow from call duration limit)
 - **Human follow-up required** - Escalation needed due to complexity or system limitation
-- **Sent via email** - Folio details sent via email (overflow from call duration limit)
+
+**From Email Interactions:**
+- **Folio Request Sent - Awaiting Response** - Email sent to hotel requesting folio; monitoring for response
+- **Folio Received - Email** - Hotel responded with folio/billing information; data extracted and recorded
+- **Email Response - Unable to Extract** - Hotel responded but data could not be automatically extracted; escalate for manual review
+- **Email - No Response** - Email sent but no response received within timeout period; escalate
+
+---
+
+## Email-Based Folio Requests & Extraction
+
+### Email Request Flow
+
+**Triggered When:**
+- Hotel provides email address instead of phone
+- Call duration would exceed maximum (overflow)
+- Hotel requests email communication
+- Voicemail message left with email request
+
+**Process:**
+
+1. **Email Composition**:
+   - System composes email with:
+     - Guest name, confirmation number
+     - Check-in and check-out dates
+     - Clear request for folio/invoice
+     - Reference ID for tracking
+   - **From**: Client email address (where hotel will respond)
+   - **To**: Hotel's email address
+
+2. **Email Monitoring**:
+   - System monitors client email inbox
+   - Checks for responses to folio requests
+   - Tracks response timeframe and correlates to request
+
+3. **Response Extraction**:
+   - When response received, system:
+     - Extracts folio/billing information from email body and attachments
+     - Parses document attachments (PDF, image) if present
+     - Extracts relevant fields: folio number, charges, dates, amounts
+     - Stores extracted data with record
+
+4. **Record Update**:
+   - Updates folio record with extracted information
+   - Records status as "Folio Received - Email"
+   - Links to email correspondence for audit trail
+   - Marks record as complete
+
+### Extraction Capabilities
+
+**Automatic Extraction Includes:**
+- Folio/invoice number
+- Guest name verification
+- Room number (if provided)
+- Check-in and check-out dates
+- Itemized charges and total amount
+- Payment method/terms
+- Any special notes or conditions
+
+**Handling Incomplete/Complex Responses:**
+- If data cannot be automatically extracted, status: "Email Response - Unable to Extract"
+- Route to human operator for manual review
+- Store raw email for operator reference
+
+### Email Monitoring Configuration
+
+**Per Hotel:**
+- Hotel's email address (where request is sent)
+- Email subject and body templates
+- Expected response timeframe
+- Timeout period before escalation
+- Document attachment formats expected (PDF, image, etc.)
 
 ---
 
@@ -354,9 +445,11 @@ See detailed logical architecture diagrams in [Folio-architecture.md](./Folio-ar
 
 | Issue | Resolution |
 |-------|-----------|
-| Email destination field | **REQUIRED input** - provided at record creation, given to callee during call |
+| Email configuration | **Client email** (from address, system-managed): where hotel responds; **Hotel email** (destination, optional): where system sends folio request |
+| Email-based folio requests | System sends email to hotel with guest details + folio request; monitors client email for response; extracts folio information from received email |
+| Data extraction from email | System extracts folio number, charges, dates, amounts from email body or attachments; escalates if extraction fails |
 | Batching strategy | **Batch same phone numbers** into single call; separate calls for unique numbers |
-| Call duration overflow | Process oldest-first; if exceeds max, notify callee remaining sent via email |
+| Call duration overflow | Process oldest-first; if exceeds max, send folio request via email instead |
 | Real-time listening | Separate operator interface + all calls recorded for analysis |
 | Mid-batch escalation | Either: (1) email remaining + continue, or (2) schedule callback + continue |
 | IVR handling | System detects IVR vs. human vs. voicemail; navigates IVR menus; leaves voicemail messages; parses callback timeframes |
