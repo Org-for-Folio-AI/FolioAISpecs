@@ -55,7 +55,9 @@ IEmailComposer {
 ```mermaid
 %%{init: {'fontSize': 18, 'fontFamily': 'arial'}}%%
 flowchart TD
-    Start["Request to compose<br/>email for record"] --> Load["Load guest data<br/>from event log"]
+    Start["Request to compose<br/>email for record"] --> GetHotelEmail["Get hotel destination email<br/>from request data<br/>or hotel configuration"]
+
+    GetHotelEmail --> Load["Load guest data<br/>from event log"]
 
     Load --> LoadTemplate["Load email template<br/>for hotel language"]
     LoadTemplate --> CheckCustom{Hotel<br/>custom<br/>template?}

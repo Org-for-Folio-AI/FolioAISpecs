@@ -137,7 +137,7 @@ graph TB
 - **Status Manager**: Updates record status based on call and email outcomes
 - **Notification Service**: Sends emails and notifications
 - **Call Recordings**: Stores and makes available all call audio
-- **Hotel Configuration**: Stores hotel-specific details (IVR paths, email addresses, preferences)
+- **Hotel Configuration**: Stores hotel-specific details (phone number, destination email address for folio requests, IVR paths, voicemail preferences)
 - **Scheduling Queue**: Maintains callbacks, verification checks, and email response timeouts
 - **Status API & UI**: Provides visibility to staff and operators
 - **Operator Interface**: Allows real-time listening, intervention, and manual folio extraction review
@@ -209,7 +209,8 @@ flowchart TD
     CheckMore -->|No| FinalSteps["Record call audio<br/>Update all records"]
 
     FinalSteps --> EmailCheck{Overflow<br/>or email<br/>needed?}
-    EmailCheck -->|Yes| SendEmail["Compose & send folio<br/>request email to hotel<br/>From: Client email"]
+    EmailCheck -->|Yes| GetHotelEmail["Get hotel destination email<br/>from request or hotel config"]
+    GetHotelEmail --> SendEmail["Compose & send folio<br/>request email to hotel<br/>To: Hotel destination email<br/>From: Client email"]
     EmailCheck -->|No| Complete["Mark batch complete"]
 
     SendEmail --> EmailMonitor["Add to email<br/>monitoring queue"]
