@@ -57,13 +57,12 @@ For each folio request record, the system:
 | Field | Type | Purpose |
 |-------|------|---------|
 | Client Email Address | Email | **REQUIRED** - From address for email requests; where hotel responds; system monitors this inbox |
-| Hotel Destination Email | Email | Optional - Hotel's email where system sends folio request details if needed |
 
-### Optional Input Fields
+### Optional Input Fields (Per Request)
 
 - Hotel Name
 - Hotel Address
-- Hotel Email Address (if known in advance)
+- Hotel Destination Email - Hotel's email where system sends folio request details (can be provided in initial upload or looked up from hotel configuration, similar to hotel phone number)
 
 ---
 
@@ -91,7 +90,7 @@ For each folio request record, the system:
 
 #### Email Alternative/Overflow Channel
 When call is not feasible or as overflow from call duration limits:
-1. System sends email to hotel's email address with:
+1. System sends email to hotel's destination email address (provided in folio request or looked up from hotel configuration) with:
    - Guest name, confirmation number, check-in/check-out dates
    - Request for folio/invoice details
    - **From address**: Client email (where hotel should respond)
