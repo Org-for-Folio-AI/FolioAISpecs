@@ -519,7 +519,7 @@ All events follow this structure:
 
 ```json
 {
-  "event_id": "uuid-v4",
+  "event_id": "uuid-v7",
   "event_type": "EventName",
   "aggregate_id": "folio_request_id",
   "aggregate_type": "FolioRequest",
